@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
-class EverybodyAuthenticationFilter : OncePerRequestFilter() {
+class EverybodyAuthenticationFilter(
+    val everybodyAuthenticationProvider: EverybodyAuthenticationProvider
+) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -18,6 +20,8 @@ class EverybodyAuthenticationFilter : OncePerRequestFilter() {
         val context = SecurityContextHolder.createEmptyContext()
         context.authentication = EverybodyAuthentication()
         SecurityContextHolder.setContext(context)
+
+        context.authentication = everybodyAuthenticationProvider.authenticate(context.authentication)
 
         filterChain.doFilter(request, response)
     }
